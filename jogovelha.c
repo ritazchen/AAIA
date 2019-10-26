@@ -18,8 +18,8 @@ Tabuleiro* inicializaTabuleiro();
 void liberaTabuleiro(Tabuleiro* t);
 void mostraTabuleiro(Tabuleiro* t);
 void poePeca(Tabuleiro* t,int x, int y, int id); //id vai ser 1 pra branco, -1 pra preto.
-char getCharPeca(Peca p); //retorna um caracter da peça desejada (REPRESENTAÇÃO VISUAL)
-int setCor(Peca p); //gera uma string da cor da peça
+char getCharPeca(Peca p); //retorna um caracter da peca desejada (REPRESENTACAO VISUAL)
+int setCor(Peca p); //gera uma string da cor da peca
 
 int main (void){
 	Tabuleiro* tab;
@@ -28,7 +28,7 @@ int main (void){
 	liberaTabuleiro(tab);
 }
 
-void mostraTabuleiro(Tabuleiro* t){ //deixar mais semioticamente viável
+void mostraTabuleiro(Tabuleiro* t){ //deixar mais semioticamente viavel
 	int i, j;
 	printf("\n");
 	for(i = 0; i < 8; i++){
@@ -80,11 +80,11 @@ Tabuleiro* inicializaTabuleiro(){
 		distribui = i%2;
 		for(j = 0; j < tam; j++){
 			if(distribui == 1 && i<3){
-				poePeca(t,i,j,1); //poe as peças brancas em cima
+				poePeca(t,i,j,1); //poe as pecas brancas em cima
 				distribui = 0;
 			}
 			else if(distribui == 1 && i>4){
-				poePeca(t,i,j,-1); //poe as peças pretas em baixo
+				poePeca(t,i,j,-1); //poe as pecas pretas em baixo
 				distribui = 0;
 			}
 			else{
