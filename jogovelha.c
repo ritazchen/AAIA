@@ -22,6 +22,7 @@ void liberaTabuleiro(Tabuleiro* t); //free coletivo
 void mostraTabuleiro(Tabuleiro* t); //printa o tabuleiro
 void poePeca(Tabuleiro* t,int x, int y, int id); //id vai ser 1 pra branco, -1 pra preto.
 void movePeca(Tabuleiro* t, Peca p, int xDestino, int yDestino); //troca as informacoes da peca
+void removePeca(Tabuleiro* t, int x, int y); //remove uma peca comida
 void clr(); //limpa tela
 char getCharPeca(Peca p); //retorna um caracter da peca desejada (REPRESENTACAO VISUAL)
 int setCor(Peca p); //gera uma string da cor da peca
@@ -60,6 +61,11 @@ int isCome(Tabuleiro* t,Peca p, Peca alvo){
 			return -1;
 		}
 	}
+}
+
+void removePeca(Tabuleiro* t, int x, int y){
+	t->board[x][y].cor = 0;
+	setCor(t->board[x][y]);
 }
 
 int atrasVazio(Tabuleiro* t, Peca p, Peca alvo, int dir){ 
@@ -154,6 +160,40 @@ void movePeca(Tabuleiro* t, Peca p, int xDestino, int yDestino){
 	int auxX, auxY, auxCor;
 	Peca aux, destino;
 	destino = getPeca(t,xDestino,yDestino);
+	if(isCome(t,p,destino) == 1){
+		int auxX = getX(destino);
+		int auxY = getY(destino);
+		if(getX(p) > auxX){ //caso caia aqui, p esta abaixo do alvo
+			if(dir == -1){// caso esquerda
+				if(auxX != 0 && auxY != 0){ //verifica se a casa acima a esquerda existe
+					auxX--;
+					auxY--;
+				}
+			}
+			if(dir == 1){//caso direita
+				if(auxX != 0 && auxY != 7){ //verifica se a casa acima a direita existe
+					auxX--;
+					auxY++;
+				}
+			}
+		}
+		else{ //caso caia aqui, p esta acima do alvo
+			if(dir == -1){// caso esquerda
+				if(auxX != 7 && auxY != 0){ //verifica se a casa abaixo a esquerda existe
+					auxX++;
+					auxY--;
+				}
+			}
+			else{ //caso direita
+				if(auxX != 7 && auxY != 7){ //verifica se a casa abaixo a direita existe
+					auxX++;
+					auxY++;
+				}
+			}
+		}
+		destino = getPeca(t,auxX,auxY);
+		removePeca(t,xDestino,yDestino);
+	}
 	moveTabuleiro(t,p,destino);
 }
 
