@@ -23,8 +23,10 @@ void mostraTabuleiro(Tabuleiro* t); //printa o tabuleiro
 void poePeca(Tabuleiro* t,int x, int y, int id); //id vai ser 1 pra branco, -1 pra preto.
 void movePeca(Tabuleiro* t, Peca p, int xDestino, int yDestino); //troca as informacoes da peca
 void removePeca(Tabuleiro* t, int x, int y); //remove uma peca comida
+void processaMovimento(Tabuleiro* t); //função que recebe uma entrada do usuario e trata o movimento
 void clr(); //limpa tela
 char getCharPeca(Peca p); //retorna um caracter da peca desejada (REPRESENTACAO VISUAL)
+char* getMovimentos(Peca p); //retorna os movimentos possiveis e pede para o usuario seleciona-los
 int setCor(Peca p); //gera uma string da cor da peca
 int getID(Peca p); //pega a ID da cor da peca
 int isCome(Tabuleiro* t, Peca p, Peca alvo); //verifica se é um movimento normal, caso seja retorna 0, ou se é um movimento que come outra peca, retornando 1, caso seja invalido, retorna -1.
@@ -45,6 +47,41 @@ int main (void){
 		finaliza = 42;
 	}
 	liberaTabuleiro(tab);
+}
+
+void processaMovimento(Tabuleiro* t){
+	int x, y; //coordenadas do par ordenado inserido pelo usuario
+	char *moves;
+	int intString; //atoi vai gerar um numero de duas casas, dezenas é x, unidades y
+	int newX, newY; 
+	Peca movida;
+	printf("Por favor, insira as coordenadas da peca que deseja mover na ordem a seguir: (linha, coluna)\n");
+	scanf("%d %d",&x,&y);
+	movida = getPeca(t,x,y);
+	moves = getMovimentos(movida);
+	intString = atoi(moves);
+	newX = intString / 10;
+	newY = intString % 10;
+	//finalizar com excecoes pra caso seja comer e o movimento em si
+}
+
+char* getMovimentos(Peca p){
+	int x1 = getX(p);
+	int x2 = x1;
+	int validador;
+	char *moves;
+	moves = (char*)malloc(sizeof(char) * 2);
+	printf("Movimentos possiveis: [1] (%d,%d) , [2] (%d,%d). Insira o numero do movimento desejado.\n",--x1,getY(p),++x2,getY(p));
+	scanf("%d",&validador);
+	if(validador == 1){
+		moves[0] = x1;
+		moves[1] = getY(p);
+	}
+	if(validador == 2){
+		moves[0] = x2;
+		moves[1] = getY(p);
+	}
+	return *moves;
 }
 
 int isCome(Tabuleiro* t,Peca p, Peca alvo){
@@ -163,6 +200,7 @@ void movePeca(Tabuleiro* t, Peca p, int xDestino, int yDestino){
 	if(isCome(t,p,destino) == 1){
 		int auxX = getX(destino);
 		int auxY = getY(destino);
+		int dir = direcao(p,destino);
 		if(getX(p) > auxX){ //caso caia aqui, p esta abaixo do alvo
 			if(dir == -1){// caso esquerda
 				if(auxX != 0 && auxY != 0){ //verifica se a casa acima a esquerda existe
