@@ -54,7 +54,7 @@ void processaMovimento(Tabuleiro* t){
 	char *moves;
 	int intString; //atoi vai gerar um numero de duas casas, dezenas é x, unidades y
 	int newX, newY; 
-	Peca movida;
+	Peca movida, destino;
 	printf("Por favor, insira as coordenadas da peca que deseja mover na ordem a seguir: (linha, coluna)\n");
 	scanf("%d %d",&x,&y);
 	movida = getPeca(t,x,y);
@@ -62,6 +62,9 @@ void processaMovimento(Tabuleiro* t){
 	intString = atoi(moves);
 	newX = intString / 10;
 	newY = intString % 10;
+	movePeca(t,movida,newX,newY); //a partir daqui, o movimento já ta feito, mas tem que ver se pode comer outra peça e se o usuario deseja isso
+	destino = getPeca(t,newX,newY);
+	
 	//finalizar com excecoes pra caso seja comer e o movimento em si
 }
 
