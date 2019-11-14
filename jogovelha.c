@@ -16,7 +16,7 @@ typedef struct tabuleiro{
 
 Tabuleiro* inicializaTabuleiro(); //mistura algumas funcoes pra gerar o tabuleiro inicial
 Peca getPeca(Tabuleiro* t,int x, int y); //troca a peca no tabuleiro
-Peca recebeInformacao(Peca info); //passa tudo de uma estrutura peca pra outra
+Peca recebeInformacao(Peca self, Peca info); //passa tudo de uma estrutura peca pra outra
 void moveTabuleiro(Tabuleiro* t, Peca x, Peca y);
 void liberaTabuleiro(Tabuleiro* t); //free coletivo
 void mostraTabuleiro(Tabuleiro* t); //printa o tabuleiro
@@ -24,9 +24,9 @@ void poePeca(Tabuleiro* t,int x, int y, int id); //id vai ser 1 pra branco, -1 p
 void movePeca(Tabuleiro* t, Peca p, int xDestino, int yDestino); //troca as informacoes da peca
 void removePeca(Tabuleiro* t, int x, int y); //remove uma peca comida
 void processaMovimento(Tabuleiro* t); //função que recebe uma entrada do usuario e trata o movimento
+void getMovimentos(Tabuleiro* t,Peca p); //retorna os movimentos possiveis e pede para o usuario seleciona-los
 void clr(); //limpa tela
 char getCharPeca(Peca p); //retorna um caracter da peca desejada (REPRESENTACAO VISUAL)
-char* getMovimentos(Peca p); //retorna os movimentos possiveis e pede para o usuario seleciona-los
 int setCor(Peca p); //gera uma string da cor da peca
 int getID(Peca p); //pega a ID da cor da peca
 int isCome(Tabuleiro* t, Peca p, Peca alvo); //verifica se é um movimento normal, caso seja retorna 0, ou se é um movimento que come outra peca, retornando 1, caso seja invalido, retorna -1.
@@ -44,47 +44,65 @@ int main (void){
 	tab = inicializaTabuleiro();
 	while(isVencedor(tab) == 0 && finaliza != 42){ //game loop (remover a variavel finaliza [unicamente pra parar o while quando eu quiser])
 		mostraTabuleiro(tab);
-		finaliza = 42;
+		processaMovimento(tab);
 	}
 	liberaTabuleiro(tab);
 }
 
 void processaMovimento(Tabuleiro* t){
 	int x, y; //coordenadas do par ordenado inserido pelo usuario
-	char *moves;
-	int intString; //atoi vai gerar um numero de duas casas, dezenas é x, unidades y
-	int newX, newY; 
 	Peca movida, destino;
-	printf("Por favor, insira as coordenadas da peca que deseja mover na ordem a seguir: (linha, coluna)\n");
-	scanf("%d %d",&x,&y);
+	printf("Por favor, insira as coordenadas da peca que deseja mover na ordem a seguir: (linha coluna)\n");
+	scanf("%d",&x);
+	scanf("%d",&y);
 	movida = getPeca(t,x,y);
-	moves = getMovimentos(movida);
-	intString = atoi(moves);
-	newX = intString / 10;
-	newY = intString % 10;
-	movePeca(t,movida,newX,newY); //a partir daqui, o movimento já ta feito, mas tem que ver se pode comer outra peça e se o usuario deseja isso
-	destino = getPeca(t,newX,newY);
-	
-	//finalizar com excecoes pra caso seja comer e o movimento em si
+	while(movida.cor == 0){
+		printf("A peca que voce deseja mover n�o � uma peca valida, por favor selecione outra: \n");
+		printf("Por favor, insira as coordenadas da peca que deseja mover na ordem a seguir: (linha coluna)\n");
+		scanf("%d",&x);
+		scanf("%d",&y);
+		movida = getPeca(t,x,y);
+	}
+	printf("%d",movida.y);
+	getMovimentos(t,movida); // ATENCAO consertar bug no retorno de moves que nao ta retornando valores
+	//destino = getPeca(t,newX,newY);
+	return; //ainda trabalhar a excecao das linhas de cima
 }
 
-char* getMovimentos(Peca p){
-	int x1 = getX(p);
-	int x2 = x1;
+void getMovimentos(Tabuleiro* t,Peca p){
+	int y1 = getY(p);
+	int y2 = y1;
+	int x = getX(p);
 	int validador;
-	char *moves;
-	moves = (char*)malloc(sizeof(char) * 2);
-	printf("Movimentos possiveis: [1] (%d,%d) , [2] (%d,%d). Insira o numero do movimento desejado.\n",--x1,getY(p),++x2,getY(p));
+	Peca destino;
+	printf("%d",x);
+	if(p.cor == 1){
+		x++;
+	}
+	if(p.cor == -1){
+		x--;
+	}
+	getchar();
+	getchar();
+	printf("Movimentos possiveis: [1] (%d,%d) , [2] (%d,%d). Insira o numero do movimento desejado.\n",x,--y1,x,++y2); //y aqui sempre � 7 CONSERTAR
 	scanf("%d",&validador);
+	if((y1 < 0 || x < 0 || y1 > 7 || x > 7) && validador == 1){
+		printf("O movimento selecionado n�o � possivel, o programa selecionou o outro automaticamente.\n");
+		validador = 2;
+	}
+	if((y2 < 0 || x < 0 || y2 > 7 || x > 7) && validador == 2){
+		printf("O movimento selecionado n�o � possivel, o programa selecionou o outro automaticamente.\n");
+		validador = 1;
+	}
 	if(validador == 1){
-		moves[0] = x1;
-		moves[1] = getY(p);
+		destino = getPeca(t,x,y1);
+		movePeca(t,p,x,y1);
 	}
 	if(validador == 2){
-		moves[0] = x2;
-		moves[1] = getY(p);
+		destino = getPeca(t,x,y2);
+		movePeca(t,p,x,y2);
 	}
-	return *moves;
+	return;
 }
 
 int isCome(Tabuleiro* t,Peca p, Peca alvo){
@@ -196,13 +214,12 @@ int direcao(Peca p, Peca alvo){
 }
 
 void movePeca(Tabuleiro* t, Peca p, int xDestino, int yDestino){
-	char auxString[10];
-	int auxX, auxY, auxCor;
-	Peca aux, destino;
+	int auxX, auxY;
+	Peca destino;
 	destino = getPeca(t,xDestino,yDestino);
 	if(isCome(t,p,destino) == 1){
-		int auxX = getX(destino);
-		int auxY = getY(destino);
+		auxX = getX(destino);
+		auxY = getY(destino);
 		int dir = direcao(p,destino);
 		if(getX(p) > auxX){ //caso caia aqui, p esta abaixo do alvo
 			if(dir == -1){// caso esquerda
@@ -243,17 +260,18 @@ void DEBUG_printaPeca(Peca p){
 }
 
 void moveTabuleiro(Tabuleiro* t,Peca x, Peca y){
-	Peca aux = recebeInformacao(y);
-	t->board[y.x][y.y] = recebeInformacao(t->board[x.x][x.y]);
-	t->board[x.x][x.y] = recebeInformacao(aux);
+	int x1,y1,x2,y2;
+	Peca aux = recebeInformacao(aux, y);
+	t->board[y.x][y.y] = recebeInformacao(t->board[y.x][y.y],t->board[x.x][x.y]);
+	t->board[x.x][x.y] = recebeInformacao(t->board[x.x][x.y],aux);
 }
 
-Peca recebeInformacao(Peca info){
+Peca recebeInformacao(Peca self, Peca info){
 	Peca destino;
 	destino.cor = info.cor;
 	setCor(destino);
-	destino.x = info.x;
-	destino.y = info.y;
+	destino.x = self.x;
+	destino.y = self.y;
 	return destino;
 }
 
