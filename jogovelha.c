@@ -8,13 +8,24 @@ typedef struct peca{
 	char corString[10]; //nome da cor (semiotica)
 	int x; //coordenada horizontal
 	int y; //coordenada vertical
+	int flagMinimax;
 }Peca;
 
 typedef struct tabuleiro{
 	Peca** board; //estrutura do tabuleiro
 }Tabuleiro;
 
+typedef struct minimax_node{
+	Tabuleiro* node;
+	struct minimax_node* filhos;
+	struct minimax_node* prox;
+	double peso;
+	int n_filhos;
+}Node;
+
 Tabuleiro* inicializaTabuleiro(); //mistura algumas funcoes pra gerar o tabuleiro inicial
+Tabuleiro* clonaTabuleiro(Tabuleiro* t);
+Node* newNode();
 Peca getPeca(Tabuleiro* t,int x, int y); //troca a peca no tabuleiro
 Peca recebeInformacao(Peca self, Peca info); //passa tudo de uma estrutura peca pra outra
 void moveTabuleiro(Tabuleiro* t, Peca x, Peca y);
@@ -23,19 +34,24 @@ void mostraTabuleiro(Tabuleiro* t); //printa o tabuleiro
 void poePeca(Tabuleiro* t,int x, int y, int id); //id vai ser 1 pra branco, -1 pra preto.
 void movePeca(Tabuleiro* t, Peca p, int xDestino, int yDestino); //troca as informacoes da peca
 void removePeca(Tabuleiro* t, int x, int y); //remove uma peca comida
+void setCor(Peca p); //gera uma string da cor da peca
 void processaMovimento(Tabuleiro* t); //funÃ§Ã£o que recebe uma entrada do usuario e trata o movimento
 void getMovimentos(Tabuleiro* t,Peca p); //retorna os movimentos possiveis e pede para o usuario seleciona-los
+void freeNode(Node* n);
 void clr(); //limpa tela
 char getCharPeca(Peca p); //retorna um caracter da peca desejada (REPRESENTACAO VISUAL)
-int setCor(Peca p); //gera uma string da cor da peca
+int isJogador(Peca p); //retorna 1 caso o seja o jogador, 0 caso seja o inimigo
 int getID(Peca p); //pega a ID da cor da peca
 int isCome(Tabuleiro* t, Peca p, Peca alvo); //verifica se Ã© um movimento normal, caso seja retorna 0, ou se Ã© um movimento que come outra peca, retornando 1, caso seja invalido, retorna -1.
 int direcao(Peca p, Peca alvo); //funcao pra ver se o alvo ta a esquerda ou direita da peca original (-1 esquerda, 1 direita)
 int atrasVazio(Tabuleiro* t, Peca p,Peca alvo, int dir); //retorna 1 se a casa atras do alvo ta vazia, 0 se tem alguem, -1 se a casa de tras nao existir
-int isVencedor(Tabuleiro *t); //retorna 1 se brancas vencem, -1 se pretas vencem, 0 se ninguem venceu
+int isVencedor(Tabuleiro* t); //retorna 1 se brancas vencem, -1 se pretas vencem, 0 se ninguem venceu
 int isPeca(Peca p); //verifica se e uma peca ou um espaco (1 se peca, 0 espaco)
 int getX(Peca p); //retorna X (linha que a peca ta)
 int getY(Peca p); //retorna Y (coluna q a peca ta)
+void MINIMAX(Tabuleiro* t, int code); //the magic stuff
+void MINIMAX_movimento(Tabuleiro* t);
+void MINIMAX_getMovimentos(Tabuleiro* t, Peca p);
 void DEBUG_printaPeca(Peca p); //funcao pra entregar os specs da peca //todas as funcoes debug vao ser deletadas depois
 
 int main (void){
@@ -45,13 +61,147 @@ int main (void){
 	while(isVencedor(tab) == 0 && finaliza != 42){ //game loop (remover a variavel finaliza [unicamente pra parar o while quando eu quiser])
 		mostraTabuleiro(tab);
 		processaMovimento(tab);
+		clr();
 	}
 	liberaTabuleiro(tab);
 }
 
+void MINIMAX(Tabuleiro *t, int code) // code = 1 pra mover inimigo, code = -1 pro jogador
+	/* Peso 5 para comer uma peça, -5 inimigo comer peça
+	   Peso -1 ao se mover pra uma casa adjacente ao inimigo
+	   Peso 0.1 para movimentação adjacente a uma parede. (pensando se vou usar ainda)
+	*/
+{
+	int i,j,valida;
+	Node* tree = newNode();
+	tree->node = clonaTabuleiro(t);
+	tree->filhos = newNode();
+	Node* p;
+	valida = 0;
+	for(i = 0; i < tam; i++){
+		if(valida == 0){
+			for(j = 0; j < tam; j++){
+				if(tree->filhos->node->board[i][j].flagMinimax == 0 && valida == 0){
+					//tree->filhos->node->board[i][j]
+					valida = 1;
+				}
+			}
+		}
+	}
+	p = tree->filhos;
+	for(i = 1; i < tree->n_filhos; i++){
+		valida = 0;
+		p->prox = newNode();
+		p->prox->node = clonaTabuleiro(tree->node);
+		//processo
+		p = p->prox;
+	}
+	
+}
+
+void MINIMAX_getMovimentos(Tabuleiro* t){
+	int y1 = getY(p);
+	int y2 = y1;
+	int x = getX(p);
+	int validador;
+	double score1 = 0;
+	double score2 = 0;
+	Peca destino;
+	if(p.cor == 1){
+		x++;
+	}
+	if(p.cor == -1){
+		x--;
+	}
+	printf("Movimentos possiveis: [1] (%d,%d) , [2] (%d,%d). Insira o numero do movimento desejado.\n",x,--y1,x,++y2);
+	//implementar calculo do peso
+	if((y1 < 0 || x < 0 || y1 > 7 || x > 7) && validador == 1){
+		validador = 2;
+	}
+	if((y2 < 0 || x < 0 || y2 > 7 || x > 7) && validador == 2){
+		validador = 1;
+	}
+	if(validador == 1){
+		destino = getPeca(t,x,y1);
+		if(isCome(t,p,destino) == 0 && destino.cor != 0 && (p.cor != destino.cor)){ //verifica se uma peça nao ta batendo na outra
+			printf("Movimento inválido, insira novas coordenadas.");
+			system("pause");
+			return;
+		}
+		movePeca(t,p,x,y1);
+	}
+	if(validador == 2){
+		destino = getPeca(t,x,y2);
+		if(isCome(t,p,destino) == 0 && destino.cor != 0 && (p.cor != destino.cor)){
+			printf("Movimento inválido, insira novas coordenadas.");
+			system("pause");
+			return;
+		}
+		movePeca(t,p,x,y2);
+	}
+	return;
+}
+
+void MINIMAX_movimento(Tabuleiro* t,int x,int y){
+	movida = getPeca(t,x,y);
+	MINIMAX_getMovimentos(t,movida);
+	return;
+}
+
+Tabuleiro* clonaTabuleiro(Tabuleiro* t){
+	int i,j;
+	Peca** tab = (Peca**)malloc(sizeof(Peca*) * tam);
+	for(i = 0; i < tam; i++){
+		tab[i] = (Peca*)malloc(sizeof(Peca) * tam);
+	}
+	for(i = 0; i < tam; i++){
+		for(j = 0; j < tam; j++){
+			tab[i][j].cor = t->board[i][j].cor;
+			tab[i][j].x = t->board[i][j].x;
+			tab[i][j].y = t->board[i][j].y;
+			if(isPeca(tab[i][j])){
+				tab[i][j].flagMinimax = 0;
+			}
+			else{
+				tab[i][j].flagMinimax = 999;
+			}
+		}
+	}
+	return t;
+}
+
+Node* newNode(){
+	int i;
+	Node* n = (Node*)malloc(sizeof(Node));
+	n->node = (Tabuleiro*)malloc(sizeof(Tabuleiro));
+	n->node->board = (Peca**)malloc(sizeof(Peca*) * tam);
+	for(i = 0; i < tam; i++){
+		n->node->board[i] = (Peca*)malloc(sizeof(Peca) * tam);
+	}
+	n->n_filhos = 24;
+	return n;
+}
+
+void freeNode(Node* n){
+	free(n);
+}
+
+int isJogador(Peca p){
+	if(p.cor == 1){
+		return p.cor;
+	}
+	if(p.cor == -1){
+		return 0;
+	}
+	else{
+		return 42;
+	}
+}
+
 void processaMovimento(Tabuleiro* t){
 	int x, y; //coordenadas do par ordenado inserido pelo usuario
-	Peca movida, destino;
+	Peca movida;
+	//Peca destino;
 	printf("Por favor, insira as coordenadas da peca que deseja mover na ordem a seguir: (linha coluna)\n");
 	scanf("%d",&x);
 	scanf("%d",&y);
@@ -84,22 +234,32 @@ void getMovimentos(Tabuleiro* t,Peca p){
 	}
 	getchar();
 	getchar();
-	printf("Movimentos possiveis: [1] (%d,%d) , [2] (%d,%d). Insira o numero do movimento desejado.\n",x,--y1,x,++y2); //y aqui sempre ï¿½ 7 CONSERTAR
+	printf("Movimentos possiveis: [1] (%d,%d) , [2] (%d,%d). Insira o numero do movimento desejado.\n",x,--y1,x,++y2);
 	scanf("%d",&validador);
 	if((y1 < 0 || x < 0 || y1 > 7 || x > 7) && validador == 1){
-		printf("O movimento selecionado nï¿½o ï¿½ possivel, o programa selecionou o outro automaticamente.\n");
+		printf("O movimento selecionado nao e possivel, o programa selecionou o outro automaticamente.\n");
 		validador = 2;
 	}
 	if((y2 < 0 || x < 0 || y2 > 7 || x > 7) && validador == 2){
-		printf("O movimento selecionado nï¿½o ï¿½ possivel, o programa selecionou o outro automaticamente.\n");
+		printf("O movimento selecionado nao e possivel, o programa selecionou o outro automaticamente.\n");
 		validador = 1;
 	}
 	if(validador == 1){
 		destino = getPeca(t,x,y1);
+		if(isCome(t,p,destino) == 0 && destino.cor != 0 && (p.cor != destino.cor)){ //verifica se uma peça nao ta batendo na outra
+			printf("Movimento inválido, insira novas coordenadas.");
+			system("pause");
+			return;
+		}
 		movePeca(t,p,x,y1);
 	}
 	if(validador == 2){
 		destino = getPeca(t,x,y2);
+		if(isCome(t,p,destino) == 0 && destino.cor != 0 && (p.cor != destino.cor)){
+			printf("Movimento inválido, insira novas coordenadas.");
+			system("pause");
+			return;
+		}
 		movePeca(t,p,x,y2);
 	}
 	return;
@@ -119,6 +279,7 @@ int isCome(Tabuleiro* t,Peca p, Peca alvo){
 			return -1;
 		}
 	}
+	return -1;
 }
 
 void removePeca(Tabuleiro* t, int x, int y){
@@ -193,6 +354,7 @@ int atrasVazio(Tabuleiro* t, Peca p, Peca alvo, int dir){
 			}
 		}
 	}
+	return -1;
 }
 
 int isPeca(Peca p){
@@ -260,7 +422,6 @@ void DEBUG_printaPeca(Peca p){
 }
 
 void moveTabuleiro(Tabuleiro* t,Peca x, Peca y){
-	int x1,y1,x2,y2;
 	Peca aux = recebeInformacao(aux, y);
 	t->board[y.x][y.y] = recebeInformacao(t->board[y.x][y.y],t->board[x.x][x.y]);
 	t->board[x.x][x.y] = recebeInformacao(t->board[x.x][x.y],aux);
@@ -343,7 +504,7 @@ int isVencedor(Tabuleiro *t){
 	}
 }
 
-int setCor(Peca p){
+void setCor(Peca p){
 	if(p.cor == 1){
 		strcpy(p.corString,"Branco");
 	}
