@@ -1,8 +1,8 @@
 from pygame.math import Vector2 as vec
 
 #Dimensoes da janela
-LARGURA, ALTURA = 560, 620 #418, 596
-
+#LARGURA, ALTURA = 560, 620 #418, 596
+LARGURA, ALTURA = 610, 670
 #Dimensoes para colocar a pontuação e as vidas restantes
 ESPACOS_JOGO = 50
 
@@ -18,6 +18,7 @@ BRANCO = (255, 255, 255)
 LARANJA = (244, 164, 96)
 AZUL = (0, 178, 238)
 AQUAMARINE = (118, 238, 198)
+CINZA = (107, 107, 107)
 
 #Fontes
 TAMANHO_FONTE = 15

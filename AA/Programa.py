@@ -10,14 +10,15 @@ class Programa:
     def __init__(self):
         self.janela = pygame.display.set_mode((LARGURA, ALTURA))  # Criacao da janela (dimensoes)
         pygame.display.set_caption("Pac Man by: Rita Chen & Vitor Queiroz")  # Titulo do programa
-        icon = pygame.image.load("imagens/pacman_32px.png")
-        pygame.display.set_icon(icon)  # Coloca na janela o desenho do pacman (no cabeçalho)
+        self.icon = pygame.image.load("imagens/pacman_32px.png")
+        pygame.display.set_icon(self.icon)  # Coloca na janela o desenho do pacman (no cabeçalho)
         self.clock = pygame.time.Clock()  # Define o clock pro fps
         self.executando = True
-        self.state = 'tela de inicio' #Quando começa o programa, aparece a tela de inicio
+        self.state = 'tela de inicio' #Quando começa o programa, aparece a tela de inicio #28
         self.largura_quadradoGrid = LARGURA_LAB // 28
         self.altura_quadradoGrid = ALTURA_LAB // 30
         self.jogador = Pacman(self, POSICAO_INICIAL_PACMAN)
+        self.paredes = []
 
         self.load()
 
@@ -49,11 +50,21 @@ class Programa:
         self.background = pygame.image.load('imagens/labirinto.png')
         self.background = pygame.transform.scale(self.background, (LARGURA_LAB, ALTURA_LAB)) #transforma o background de forma a caber na janela
 
-    def draw_grid(self): #matriz de posicoes para demarcar onde o jogador poderá andar, paredes, moedas..
+        #faz a leitura das paredes existentes
+        with open("paredes.txt", 'r') as arquivo:
+            for indice_y, linha in enumerate(arquivo):
+                for indice_x, parede in enumerate(linha):
+                    if parede == '1':
+                        self.paredes.append(vec(indice_x, indice_y)) #passa as coordenadas de cada parede para a lista paredes
+
+    def desenha_grid(self): #matriz de posicoes para demarcar onde o jogador poderá andar, paredes, moedas..
         for x in range(LARGURA//self.largura_quadradoGrid):
-            pygame.draw.line(self.background, BRANCO, (x*self.largura_quadradoGrid, 0), (x*self.largura_quadradoGrid, ALTURA))
+            pygame.draw.line(self.background, CINZA, (x*self.largura_quadradoGrid, 0), (x*self.largura_quadradoGrid, ALTURA))
         for x in range(ALTURA//self.altura_quadradoGrid):
-            pygame.draw.line(self.background, BRANCO, (0, x*self.altura_quadradoGrid), (LARGURA, x*self.altura_quadradoGrid))
+            pygame.draw.line(self.background, CINZA, (0, x*self.altura_quadradoGrid), (LARGURA, x*self.altura_quadradoGrid))
+        for parede in self.paredes:
+            pygame.draw.rect(self.background, AQUAMARINE, (parede.x*self.largura_quadradoGrid, parede.y*self.altura_quadradoGrid,
+                                                           self.largura_quadradoGrid, self.altura_quadradoGrid))
 
     def telaInicio_eventos(self):
         for evento in pygame.event.get():
@@ -103,7 +114,7 @@ class Programa:
     def jogo_desenha(self):
         self.janela.fill(PRETO)
         self.janela.blit(self.background, (ESPACOS_JOGO//2, ESPACOS_JOGO//2))
-        self.draw_grid()
+        self.desenha_grid()
         self.escreve_texto('SCORE: 0', self.janela, [10,2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
         self.escreve_texto('HIGH SCORE: 0', self.janela, [LARGURA-140, 2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
         self.jogador.draw()
