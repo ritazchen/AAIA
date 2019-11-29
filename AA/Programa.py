@@ -66,7 +66,7 @@ class Programa:
             pygame.draw.line(self.janela, CINZA, (x*self.largura_quadradoGrid, 0), (x*self.largura_quadradoGrid, ALTURA))
         for x in range(ALTURA//self.altura_quadradoGrid):
             pygame.draw.line(self.janela, CINZA, (0, x*self.altura_quadradoGrid), (LARGURA, x*self.altura_quadradoGrid))
-       #for parede in self.paredes:
+        #for parede in self.paredes:
             #pygame.draw.rect(self.background, AQUAMARINE, (parede.x*self.largura_quadradoGrid, parede.y*self.altura_quadradoGrid,
                                                             #self.largura_quadradoGrid, self.altura_quadradoGrid))
         #for moeda in self.moedas:
