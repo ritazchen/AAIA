@@ -19,6 +19,7 @@ class Programa:
         self.altura_quadradoGrid = ALTURA_LAB // 30
         self.jogador = Pacman(self, POSICAO_INICIAL_PACMAN)
         self.paredes = []
+        self.moedas = []
 
         self.load()
 
@@ -49,22 +50,28 @@ class Programa:
     def load(self):
         self.background = pygame.image.load('imagens/labirinto.png')
         self.background = pygame.transform.scale(self.background, (LARGURA_LAB, ALTURA_LAB)) #transforma o background de forma a caber na janela
+        #self.moedaImg = pygame.image.load('imagens/moeda.png')
 
-        #faz a leitura das paredes existentes
-        with open("paredes.txt", 'r') as arquivo:
+        #faz a leitura das paredes e moedas existentes
+        with open("coisas.txt", 'r') as arquivo:
             for indice_y, linha in enumerate(arquivo):
-                for indice_x, parede in enumerate(linha):
-                    if parede == '1':
+                for indice_x, objeto in enumerate(linha):
+                    if objeto == 'P':
                         self.paredes.append(vec(indice_x, indice_y)) #passa as coordenadas de cada parede para a lista paredes
+                    elif objeto == 'M':
+                        self.moedas.append(vec(indice_x, indice_y)) #passa as coordenadas de cada moeda para a lista moedas
 
     def desenha_grid(self): #matriz de posicoes para demarcar onde o jogador poderá andar, paredes, moedas..
         for x in range(LARGURA//self.largura_quadradoGrid):
-            pygame.draw.line(self.background, CINZA, (x*self.largura_quadradoGrid, 0), (x*self.largura_quadradoGrid, ALTURA))
+            pygame.draw.line(self.janela, CINZA, (x*self.largura_quadradoGrid, 0), (x*self.largura_quadradoGrid, ALTURA))
         for x in range(ALTURA//self.altura_quadradoGrid):
-            pygame.draw.line(self.background, CINZA, (0, x*self.altura_quadradoGrid), (LARGURA, x*self.altura_quadradoGrid))
-        for parede in self.paredes:
-            pygame.draw.rect(self.background, AQUAMARINE, (parede.x*self.largura_quadradoGrid, parede.y*self.altura_quadradoGrid,
-                                                           self.largura_quadradoGrid, self.altura_quadradoGrid))
+            pygame.draw.line(self.janela, CINZA, (0, x*self.altura_quadradoGrid), (LARGURA, x*self.altura_quadradoGrid))
+       #for parede in self.paredes:
+            #pygame.draw.rect(self.background, AQUAMARINE, (parede.x*self.largura_quadradoGrid, parede.y*self.altura_quadradoGrid,
+                                                            #self.largura_quadradoGrid, self.altura_quadradoGrid))
+        #for moeda in self.moedas:
+            #pygame.draw.rect(self.background, LARANJA, (moeda.x*self.largura_quadradoGrid, moeda.y*self.altura_quadradoGrid,
+                                                            #self.largura_quadradoGrid, self.altura_quadradoGrid))
 
     def telaInicio_eventos(self):
         for evento in pygame.event.get():
@@ -114,8 +121,15 @@ class Programa:
     def jogo_desenha(self):
         self.janela.fill(PRETO)
         self.janela.blit(self.background, (ESPACOS_JOGO//2, ESPACOS_JOGO//2))
-        self.desenha_grid()
+        self.desenha_moedas()
+        #self.desenha_grid()
         self.escreve_texto('SCORE: 0', self.janela, [10,2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
-        self.escreve_texto('HIGH SCORE: 0', self.janela, [LARGURA-140, 2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
+        self.escreve_texto('HIGH SCORE: 0', self.janela, [LARGURA-160, 2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
         self.jogador.draw()
         pygame.display.update()
+        #self.moedas.pop()
+
+    def desenha_moedas(self):
+        for moeda in self.moedas:
+            pygame.draw.circle(self.background, AMARELO, (int(self.largura_quadradoGrid//2 + moeda.x*self.largura_quadradoGrid),
+                                                          int(self.altura_quadradoGrid//2 + moeda.y*self.altura_quadradoGrid)), 4)

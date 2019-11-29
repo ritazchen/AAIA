@@ -11,14 +11,18 @@ class Pacman:
         self.pix_pos.y += 9
         self.direcao = vec(1,0)
         self.stored_direcao = None
+        self.pode_mover = True
         self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
 
-    def atualiza(self): #esses ifs travaram meu pc
-        self.pix_pos += self.direcao
+    def atualiza(self):
+        #só pode andar se não for parede
+        if self.pode_mover:
+            self.pix_pos += self.direcao
         # não permitir que ande pela diagonal
         if self.tempo_para_mover():
             if self.stored_direcao != None:
                 self.direcao = self.stored_direcao
+            self.pode_mover = self.verifica_movimento()
 
         #a parte de baixo indica qual a posicao do grid está o pacman
         self.grid_pos[0] = (self.pix_pos[0]-ESPACOS_JOGO + self.programa.largura_quadradoGrid//2)//self.programa.largura_quadradoGrid + 1 #2
@@ -47,3 +51,11 @@ class Pacman:
         if int(self.pix_pos.y+ESPACOS_JOGO//2) % self.programa.altura_quadradoGrid == 0:
             if self.direcao == vec(0,1) or self.direcao == vec(0,-1):
                 return True
+
+    def verifica_movimento(self):
+        #se o bater numa parede, não vai atravessar
+        #tentar fazer com que ele não deixe movimentar pro lado da parede
+        for parede in self.programa.paredes:
+            if vec(self.grid_pos + self.direcao) == parede:
+                return False
+        return True
