@@ -1,4 +1,4 @@
-from pygame.math import Vector2 as vec
+#from pygame.math import Vector2 as vec
 
 #Dimensoes da janela
 #LARGURA, ALTURA = 560, 620 #418, 596
@@ -26,5 +26,3 @@ TAMANHO_FONTE = 15
 TAMANHO_FONTEJOGO = 14
 FONTE = 'arial black'
 
-#Informacoes sobre o Pacman
-POSICAO_INICIAL_PACMAN = vec(1,1) #posicao inicial dele

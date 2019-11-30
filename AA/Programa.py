@@ -2,6 +2,7 @@ import pygame
 import sys
 from AA.configuracoes import *
 from AA.Pacman import *
+from AA.Fantasma import *
 
 pygame.init()
 vec = pygame.math.Vector2
@@ -17,11 +18,13 @@ class Programa:
         self.state = 'tela de inicio' #Quando começa o programa, aparece a tela de inicio #28
         self.largura_quadradoGrid = LARGURA_LAB // 28
         self.altura_quadradoGrid = ALTURA_LAB // 30
-        self.jogador = Pacman(self, POSICAO_INICIAL_PACMAN)
         self.paredes = []
         self.moedas = []
-
+        self.fantasmas = []
+        self.jogador_posicao = None
         self.load()
+        self.jogador = Pacman(self, self.jogador_posicao)
+        self.cria_inimigos()
 
     def run(self):
         while self.executando: #enquanto o programa estiver executando...
@@ -48,7 +51,7 @@ class Programa:
         janela.blit(text, posicao)
 
     def load(self):
-        self.background = pygame.image.load('imagens/labirinto_porta.png')
+        self.background = pygame.image.load('imagens/labirinto.png')
         #self.background = pygame.transform.scale(self.background, (LARGURA_LAB, ALTURA_LAB)) #transforma o background de forma a caber na janela
         #self.moedaImg = pygame.image.load('imagens/moeda.png')
 
@@ -60,7 +63,12 @@ class Programa:
                         self.paredes.append(vec(indice_x, indice_y)) #passa as coordenadas de cada parede para a lista paredes
                     elif objeto == 'M':
                         self.moedas.append(vec(indice_x, indice_y)) #passa as coordenadas de cada moeda para a lista moedas
+                    elif objeto == 'J':
+                        self.jogador_posicao = vec(indice_x, indice_y) #passa as coordenadas de cada moeda para a lista moedas
         arquivo.close()
+
+    def cria_inimigos(self):
+        self.fantasmas.append(Fantasma(self))
 
     def desenha_grid(self): #matriz de posicoes para demarcar onde o jogador poderá andar, paredes, moedas..
         for x in range(LARGURA//self.largura_quadradoGrid):
@@ -125,7 +133,7 @@ class Programa:
         #self.desenha_grid()
         self.escreve_texto('SCORE: {}'.format(self.jogador.pontuacao), self.janela, [10,2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
         self.escreve_texto('HIGH SCORE: 0', self.janela, [LARGURA-160, 2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
-        self.jogador.draw()
+        self.jogador.desenha()
         pygame.display.update()
 
     def desenha_moedas(self):

@@ -13,7 +13,7 @@ class Pacman:
         self.stored_direcao = None
         self.pode_mover = True
         self.pontuacao = 0
-        self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
+        #self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
 
     def atualiza(self):
         #só pode andar se não for parede
@@ -32,7 +32,7 @@ class Pacman:
         if self.sobreAMoeda():
             self.coleta_moeda()
 
-    def draw(self):
+    def desenha(self):
         #pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
         #self.programa.janela.blit(self.pacmanImg, ((int)(self.pix_pos.x), (int)(self.pix_pos.y)))
         pygame.draw.circle(self.programa.janela, LARANJA, (int(self.pix_pos.x), int(self.pix_pos.y)), self.programa.largura_quadradoGrid//2-2)
@@ -41,11 +41,14 @@ class Pacman:
                                                          #self.programa.largura_quadradoGrid, self.programa.altura_quadradoGrid), 1)
 
     def sobreAMoeda(self):
+        #verifica se o pacman passou por cima das moedas
         if self.grid_pos in self.programa.moedas:
-            return True
+            if self.tempo_para_mover():
+                return True
         return False
 
     def coleta_moeda(self):
+        #remove da lista de moedas existentes e soma 10 à pontuação
         self.programa.moedas.remove(self.grid_pos)
         self.pontuacao += 10
 
