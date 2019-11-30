@@ -76,3 +76,9 @@ class Pacman:
             if vec(self.grid_pos + self.direcao) == parede:
                 return False
         return True
+
+    def get_grid_posX(self):
+        return self.grid_pos.x
+
+    def get_grid_posY(self):
+        return self.grid_pos.y

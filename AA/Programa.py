@@ -97,7 +97,7 @@ class Programa:
             if evento.type == pygame.QUIT:  # Se apertar o X, encerra o programa
                 self.executando = False
             else:
-                print(pygame.mouse.get_pos())
+                #print(pygame.mouse.get_pos())
                 if pygame.mouse.get_pos()[0] >= 160 and pygame.mouse.get_pos()[0] <= 343:
                     if pygame.mouse.get_pos()[1] >= 328 and pygame.mouse.get_pos()[1] <= 442: #arrumar
                         self.passei = 1
@@ -120,21 +120,35 @@ class Programa:
 
     def jogo_eventos(self):
         for evento in pygame.event.get():
+            up = 0
+            down = 0
+            left = 0
+            right = 0
             if evento.type == pygame.QUIT:  # Se apertar o X, encerra o programa
                 self.executando = False
             if evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_UP:
-                    self.jogador.move(vec(0,-1))
-                    self.jogador.angulo = 90
-                elif evento.key == pygame.K_DOWN:
-                    self.jogador.angulo = 270
-                    self.jogador.move(vec(0, 1))
-                elif evento.key == pygame.K_LEFT:
-                    self.jogador.angulo = 180
-                    self.jogador.move(vec(-1, 0))
-                elif evento.key == pygame.K_RIGHT:
-                    self.jogador.angulo = 0
-                    self.jogador.move(vec(1, 0))
+                for parede in self.paredes: #se o proximo mov bater numa parede, nao deixar movimentar
+                    if [int(self.jogador.get_grid_posX()), int(self.jogador.get_grid_posY() - 1)] != [int(parede[0]), int(parede[1])]:
+                        up += 1
+                    if [int(self.jogador.get_grid_posX()), int(self.jogador.get_grid_posY() + 1)] != [int(parede[0]), int(parede[1])]:
+                        down += 1
+                    if [int(self.jogador.get_grid_posX() - 1), int(self.jogador.get_grid_posY())] != [int(parede[0]), int(parede[1])]:
+                        left += 1
+                    if [int(self.jogador.get_grid_posX() + 1), int(self.jogador.get_grid_posY())] != [int(parede[0]), int(parede[1])]:
+                        right += 1
+
+                    if up == len(self.paredes) and (evento.key == pygame.K_UP or evento.key == pygame.K_w):
+                        self.jogador.move(vec(0,-1))
+                        self.jogador.angulo = 90
+                    if down == len(self.paredes) and (evento.key == pygame.K_DOWN or evento.key == pygame.K_s):
+                        self.jogador.angulo = 270
+                        self.jogador.move(vec(0, 1))
+                    if left == len(self.paredes) and (evento.key == pygame.K_LEFT or evento.key == pygame.K_a):
+                        self.jogador.angulo = 180
+                        self.jogador.move(vec(-1, 0))
+                    if right == len(self.paredes) and (evento.key == pygame.K_RIGHT or evento.key == pygame.K_d):
+                        self.jogador.angulo = 0
+                        self.jogador.move(vec(1, 0))
 
     def jogo_atualiza(self):
         self.jogador.atualiza()
