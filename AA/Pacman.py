@@ -7,18 +7,19 @@ class Pacman:
         self.programa = programa
         self.grid_pos = posicao
         self.pix_pos = self.get_pix_pos()
-        self.pix_pos.x += 9
-        self.pix_pos.y += 9
+        #self.pix_pos.x += 9
+        #self.pix_pos.y += 9
         self.direcao = vec(1,0)
         self.stored_direcao = None
         self.pode_mover = True
         self.pontuacao = 0
-        #self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
+        self.velocidade = 2
+        self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
 
     def atualiza(self):
         #só pode andar se não for parede
         if self.pode_mover:
-            self.pix_pos += self.direcao
+            self.pix_pos += self.direcao*self.velocidade
         # não permitir que ande pela diagonal
         if self.tempo_para_mover():
             if self.stored_direcao != None:
@@ -35,7 +36,7 @@ class Pacman:
     def desenha(self):
         #pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
         #self.programa.janela.blit(self.pacmanImg, ((int)(self.pix_pos.x), (int)(self.pix_pos.y)))
-        pygame.draw.circle(self.programa.janela, LARANJA, (int(self.pix_pos.x), int(self.pix_pos.y)), self.programa.largura_quadradoGrid//2-2)
+        pygame.draw.circle(self.programa.janela, AMARELO, (int(self.pix_pos.x), int(self.pix_pos.y)), self.programa.largura_quadradoGrid//2-2)
         #pygame.draw.rect(self.programa.janela, LARANJA, (self.grid_pos[0]*self.programa.largura_quadradoGrid + ESPACOS_JOGO//2,
                                                          #self.grid_pos[1]*self.programa.altura_quadradoGrid + ESPACOS_JOGO//2,
                                                          #self.programa.largura_quadradoGrid, self.programa.altura_quadradoGrid), 1)
@@ -55,9 +56,9 @@ class Pacman:
     def move(self, direcao):
         self.stored_direcao = direcao
 
-    def get_pix_pos(self):
-        return vec((self.grid_pos.x*self.programa.largura_quadradoGrid) + ESPACOS_JOGO//3+self.programa.largura_quadradoGrid//2,
-                (self.grid_pos.y*self.programa.altura_quadradoGrid) + ESPACOS_JOGO//3+self.programa.altura_quadradoGrid//2)
+    def get_pix_pos(self): #espacos_jogo//3
+        return vec((self.grid_pos.x*self.programa.largura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.largura_quadradoGrid//2,
+                (self.grid_pos.y*self.programa.altura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.altura_quadradoGrid//2)
 
     def tempo_para_mover(self):
         #bloqueia que ele mude de coordenada no mesmo tempo.

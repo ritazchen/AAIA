@@ -67,13 +67,16 @@ class Programa:
                     elif objeto == 'J':
                         self.jogador_posicao = vec(indice_x, indice_y) #passa as coordenadas de cada moeda para a lista moedas
                     elif objeto in ["1", "2", "3", "4"]:
-                        self.fantasma_posicao.append(vec(indice_x, indice_y))
+                        self.fantasma_posicao.append(vec(indice_x, indice_y)) #passa as coordenadas de inicio dos inimigos
+                    #elif objeto == 'D': #onde estao as portas para os inimigos saírem
+                        #colocar as coordenadas para q o pacman não entre e que os inimigos saiam o mais rapido possivel de la dentro
         arquivo.close()
 
     def cria_inimigos(self):
         #cria um inimigo em cada posição
-        for posicao in self.fantasma_posicao:
-            self.fantasmas.append(Fantasma(self, posicao))
+        for indice_x, posicao in enumerate(self.fantasma_posicao):
+            print(indice_x)
+            self.fantasmas.append(Fantasma(self, vec(posicao), indice_x))
 
     def desenha_grid(self): #matriz de posicoes para demarcar onde o jogador poderá andar, paredes, moedas..
         for x in range(LARGURA//self.largura_quadradoGrid):
