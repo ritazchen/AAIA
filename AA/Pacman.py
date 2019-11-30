@@ -12,6 +12,7 @@ class Pacman:
         self.direcao = vec(1,0)
         self.stored_direcao = None
         self.pode_mover = True
+        self.pontuacao = 0
         self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
 
     def atualiza(self):
@@ -28,13 +29,25 @@ class Pacman:
         self.grid_pos[0] = (self.pix_pos[0]-ESPACOS_JOGO + self.programa.largura_quadradoGrid//2)//self.programa.largura_quadradoGrid + 1 #2
         self.grid_pos[1] = (self.pix_pos[1]-ESPACOS_JOGO + self.programa.altura_quadradoGrid//2)//self.programa.altura_quadradoGrid + 1 #2
 
+        if self.sobreAMoeda():
+            self.coleta_moeda()
+
     def draw(self):
         #pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
         #self.programa.janela.blit(self.pacmanImg, ((int)(self.pix_pos.x), (int)(self.pix_pos.y)))
         pygame.draw.circle(self.programa.janela, LARANJA, (int(self.pix_pos.x), int(self.pix_pos.y)), self.programa.largura_quadradoGrid//2-2)
-        pygame.draw.rect(self.programa.janela, LARANJA, (self.grid_pos[0]*self.programa.largura_quadradoGrid + ESPACOS_JOGO//2,
-                                                         self.grid_pos[1]*self.programa.altura_quadradoGrid + ESPACOS_JOGO//2,
-                                                         self.programa.largura_quadradoGrid, self.programa.altura_quadradoGrid), 1)
+        #pygame.draw.rect(self.programa.janela, LARANJA, (self.grid_pos[0]*self.programa.largura_quadradoGrid + ESPACOS_JOGO//2,
+                                                         #self.grid_pos[1]*self.programa.altura_quadradoGrid + ESPACOS_JOGO//2,
+                                                         #self.programa.largura_quadradoGrid, self.programa.altura_quadradoGrid), 1)
+
+    def sobreAMoeda(self):
+        if self.grid_pos in self.programa.moedas:
+            return True
+        return False
+
+    def coleta_moeda(self):
+        self.programa.moedas.remove(self.grid_pos)
+        self.pontuacao += 10
 
     def move(self, direcao):
         self.stored_direcao = direcao

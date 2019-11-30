@@ -48,8 +48,8 @@ class Programa:
         janela.blit(text, posicao)
 
     def load(self):
-        self.background = pygame.image.load('imagens/labirinto.png')
-        self.background = pygame.transform.scale(self.background, (LARGURA_LAB, ALTURA_LAB)) #transforma o background de forma a caber na janela
+        self.background = pygame.image.load('imagens/labirinto_porta.png')
+        #self.background = pygame.transform.scale(self.background, (LARGURA_LAB, ALTURA_LAB)) #transforma o background de forma a caber na janela
         #self.moedaImg = pygame.image.load('imagens/moeda.png')
 
         #faz a leitura das paredes e moedas existentes
@@ -60,6 +60,7 @@ class Programa:
                         self.paredes.append(vec(indice_x, indice_y)) #passa as coordenadas de cada parede para a lista paredes
                     elif objeto == 'M':
                         self.moedas.append(vec(indice_x, indice_y)) #passa as coordenadas de cada moeda para a lista moedas
+        arquivo.close()
 
     def desenha_grid(self): #matriz de posicoes para demarcar onde o jogador poderá andar, paredes, moedas..
         for x in range(LARGURA//self.largura_quadradoGrid):
@@ -115,7 +116,6 @@ class Programa:
                     self.jogador.move(vec(1, 0))
 
     def jogo_atualiza(self):
-        pass
         self.jogador.atualiza()
 
     def jogo_desenha(self):
@@ -123,13 +123,12 @@ class Programa:
         self.janela.blit(self.background, (ESPACOS_JOGO//2, ESPACOS_JOGO//2))
         self.desenha_moedas()
         #self.desenha_grid()
-        self.escreve_texto('SCORE: 0', self.janela, [10,2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
+        self.escreve_texto('SCORE: {}'.format(self.jogador.pontuacao), self.janela, [10,2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
         self.escreve_texto('HIGH SCORE: 0', self.janela, [LARGURA-160, 2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
         self.jogador.draw()
         pygame.display.update()
-        #self.moedas.pop()
 
     def desenha_moedas(self):
         for moeda in self.moedas:
-            pygame.draw.circle(self.background, AMARELO, (int(self.largura_quadradoGrid//2 + moeda.x*self.largura_quadradoGrid),
-                                                          int(self.altura_quadradoGrid//2 + moeda.y*self.altura_quadradoGrid)), 4)
+            pygame.draw.circle(self.janela, AMARELO, (int(ESPACOS_JOGO//2 + self.largura_quadradoGrid//2 + moeda.x*self.largura_quadradoGrid),
+                                                          int(ESPACOS_JOGO//2 + self.altura_quadradoGrid//2 + moeda.y*self.altura_quadradoGrid)), 4)
