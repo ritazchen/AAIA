@@ -26,6 +26,7 @@ class Programa:
         self.load()
         self.jogador = Pacman(self, self.jogador_posicao)
         self.cria_inimigos()
+        self.passei = 0
 
     def run(self):
         while self.executando: #enquanto o programa estiver executando...
@@ -52,6 +53,8 @@ class Programa:
         janela.blit(text, posicao)
 
     def load(self):
+        self.inicio = pygame.image.load('imagens/tela_inicio.png')
+        self.aperta_jogar = pygame.image.load('imagens/tela_inicio_aperta.png')
         self.background = pygame.image.load('imagens/labirinto.png')
         #self.background = pygame.transform.scale(self.background, (LARGURA_LAB, ALTURA_LAB)) #transforma o background de forma a caber na janela
         #self.moedaImg = pygame.image.load('imagens/moeda.png')
@@ -75,7 +78,6 @@ class Programa:
     def cria_inimigos(self):
         #cria um inimigo em cada posição
         for indice_x, posicao in enumerate(self.fantasma_posicao):
-            print(indice_x)
             self.fantasmas.append(Fantasma(self, vec(posicao), indice_x))
 
     def desenha_grid(self): #matriz de posicoes para demarcar onde o jogador poderá andar, paredes, moedas..
@@ -94,8 +96,14 @@ class Programa:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:  # Se apertar o X, encerra o programa
                 self.executando = False
-            if evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_SPACE: # Se apertar o espaço, começa o jogo
+            else:
+                print(pygame.mouse.get_pos())
+                if pygame.mouse.get_pos()[0] >= 160 and pygame.mouse.get_pos()[0] <= 343:
+                    if pygame.mouse.get_pos()[1] >= 328 and pygame.mouse.get_pos()[1] <= 442: #arrumar
+                        self.passei = 1
+                else:
+                    self.passei = 0
+                if evento.type == pygame.MOUSEBUTTONDOWN and self.passei == 1:
                     self.state = 'jogando'
 
     def telaInicio_atualiza(self):
@@ -103,14 +111,11 @@ class Programa:
 
     def telaInicio_desenha(self): #O que vai ter na tela de inicio
         self.janela.fill(PRETO)
-        self.escreve_texto('HIGH SCORE', self.janela, [LARGURA//2-200, 10],
-                           TAMANHO_FONTE, (BRANCO), FONTE, centralizado = False)
-        self.escreve_texto('PUSH SPACE BAR', self.janela, [LARGURA//2, ALTURA//2 - 50], TAMANHO_FONTE,
-                           (LARANJA), FONTE, centralizado = True)
-        self.escreve_texto('1 PLAYER ONLY', self.janela, [LARGURA // 2, ALTURA // 2], TAMANHO_FONTE,
-                           (AZUL), FONTE, centralizado = True)
-        self.escreve_texto('GAME BY: RITA CHEN & VITOR QUEIROZ', self.janela, [LARGURA // 2, ALTURA // 2 + 250], TAMANHO_FONTE,
-                           (AQUAMARINE), FONTE, centralizado = True)
+        if self.passei == 0:
+            self.janela.blit(self.inicio, (0, 0))
+        else:
+            self.janela.blit(self.aperta_jogar, (0, 0))
+
         pygame.display.update()
 
     def jogo_eventos(self):
