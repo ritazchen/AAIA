@@ -22,6 +22,7 @@ class Programa:
         self.moedas = []
         self.fantasmas = []
         self.jogador_posicao = None
+        self.fantasma_posicao = []
         self.load()
         self.jogador = Pacman(self, self.jogador_posicao)
         self.cria_inimigos()
@@ -46,7 +47,7 @@ class Programa:
         text_size = text.get_size()
         #Para centralizar o texto na tela
         if centralizado:
-            posicao[0] = posicao[0]-text_size[0]//2
+            posicao[0] = posicao[0] - text_size[0]//2
             posicao[1] = posicao[1] - text_size[1]//2
         janela.blit(text, posicao)
 
@@ -65,10 +66,14 @@ class Programa:
                         self.moedas.append(vec(indice_x, indice_y)) #passa as coordenadas de cada moeda para a lista moedas
                     elif objeto == 'J':
                         self.jogador_posicao = vec(indice_x, indice_y) #passa as coordenadas de cada moeda para a lista moedas
+                    elif objeto in ["1", "2", "3", "4"]:
+                        self.fantasma_posicao.append(vec(indice_x, indice_y))
         arquivo.close()
 
     def cria_inimigos(self):
-        self.fantasmas.append(Fantasma(self))
+        #cria um inimigo em cada posição
+        for posicao in self.fantasma_posicao:
+            self.fantasmas.append(Fantasma(self, posicao))
 
     def desenha_grid(self): #matriz de posicoes para demarcar onde o jogador poderá andar, paredes, moedas..
         for x in range(LARGURA//self.largura_quadradoGrid):
@@ -125,6 +130,8 @@ class Programa:
 
     def jogo_atualiza(self):
         self.jogador.atualiza()
+        for fantasma in self.fantasmas:
+            fantasma.atualiza()
 
     def jogo_desenha(self):
         self.janela.fill(PRETO)
@@ -134,6 +141,8 @@ class Programa:
         self.escreve_texto('SCORE: {}'.format(self.jogador.pontuacao), self.janela, [10,2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
         self.escreve_texto('HIGH SCORE: 0', self.janela, [LARGURA-160, 2], TAMANHO_FONTEJOGO, BRANCO, FONTE, centralizado=False)
         self.jogador.desenha()
+        for fantasma in self.fantasmas:
+            fantasma.desenha()
         pygame.display.update()
 
     def desenha_moedas(self):
