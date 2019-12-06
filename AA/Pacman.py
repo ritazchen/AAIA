@@ -6,6 +6,7 @@ class Pacman:
     def __init__(self, programa, posicao):
         self.programa = programa
         self.grid_pos = posicao
+        self.starting_pos = [posicao.x, posicao.y]
         self.pix_pos = self.get_pix_pos()
         #self.pix_pos.x += 9
         #self.pix_pos.y += 9
@@ -41,6 +42,10 @@ class Pacman:
         #pygame.draw.rect(self.programa.janela, LARANJA, (self.grid_pos[0]*self.programa.largura_quadradoGrid + ESPACOS_JOGO//2,
                                                          #self.grid_pos[1]*self.programa.altura_quadradoGrid + ESPACOS_JOGO//2,
                                                          #self.programa.largura_quadradoGrid, self.programa.altura_quadradoGrid), 1)
+            #if self.vidas >= 2:
+                #self.programa.janela.blit(self.vidaImg, (35, ALTURA - 25))
+            #if self.vidas >=3:
+                #self.programa.janela.blit(self.vidaImg, (55, ALTURA - 25))
 
     def sobreAMoeda(self):
         #verifica se o pacman passou por cima das moedas
@@ -58,15 +63,15 @@ class Pacman:
         self.stored_direcao = direcao
 
     def get_pix_pos(self): #espacos_jogo//3
-        return vec((self.grid_pos.x*self.programa.largura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.largura_quadradoGrid//2,
-                (self.grid_pos.y*self.programa.altura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.altura_quadradoGrid//2)
+        return vec((self.grid_pos[0]*self.programa.largura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.largura_quadradoGrid//2,
+                (self.grid_pos[1]*self.programa.altura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.altura_quadradoGrid//2)
 
     def tempo_para_mover(self):
         #bloqueia que ele mude de coordenada no mesmo tempo.
         if int(self.pix_pos.x+ESPACOS_JOGO//2) % self.programa.largura_quadradoGrid == 0:
-            if self.direcao == vec(1,0) or self.direcao == vec(-1,0):
+            if self.direcao == vec(1,0) or self.direcao == vec(-1,0) or self.direcao == vec(0,0):
                 return True
-        if int(self.pix_pos.y+ESPACOS_JOGO//2) % self.programa.altura_quadradoGrid == 0:
+        if int(self.pix_pos.y+ESPACOS_JOGO//2) % self.programa.altura_quadradoGrid == 0 or self.direcao == vec(0,0):
             if self.direcao == vec(0,1) or self.direcao == vec(0,-1):
                 return True
         return False
@@ -80,7 +85,7 @@ class Pacman:
         return True
 
     def get_grid_posX(self):
-        return self.grid_pos.x
+        return self.grid_pos[0]
 
     def get_grid_posY(self):
-        return self.grid_pos.y
+        return self.grid_pos[1]

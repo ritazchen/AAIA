@@ -1,7 +1,3 @@
-import pygame
-import random
-import math
-
 from AA.Vertice import *
 from AA.configuracoes import *
 vec = pygame.math.Vector2
@@ -10,6 +6,7 @@ class Fantasma:
     def __init__(self, programa, posicao, num):
         self.programa = programa #chama o programa
         self.grid_pos = posicao #posicao do inimigo em relação ao grid
+        self.starting_pos = [posicao.x, posicao.y]
         self.pix_pos = self.get_pix_pos() #posicao do inimigo em relação aos pixels
         #as adições são só feitas para que os inimigos fiquem no centro do espaço
         self.pix_pos.x += 11
@@ -22,12 +19,12 @@ class Fantasma:
         self.forma = self.set_forma() #se ele vai estar normal (rapido) ou se vai estar assustado (lento)
         self.target = None #objetivo de alcançar o pacman ou fugir do pacman
         self.fantAzulImg = pygame.image.load("imagens/fant_azul.png")
-        self.velocidade = 2
+        self.velocidade = self.altera_velocidade()
 
     def atualiza(self):
         self.target = self.set_target()
         if self.target != self.grid_pos:
-            self.pix_pos += self.direcao
+            self.pix_pos += self.direcao*self.velocidade
             if self.tempo_para_mover():
                 self.move()
 
@@ -35,6 +32,13 @@ class Fantasma:
         self.grid_pos[0] = (self.pix_pos[0] - ESPACOS_JOGO + self.programa.largura_quadradoGrid // 2) // self.programa.largura_quadradoGrid + 1  # 2
         self.grid_pos[1] = (self.pix_pos[1] - ESPACOS_JOGO + self.programa.altura_quadradoGrid // 2) // self.programa.altura_quadradoGrid + 1  # 2
 
+    def altera_velocidade(self):
+        if self.forma in ["blinky", "inky"]:
+            velocidade = 2
+        else:
+            velocidade = 1
+
+        return velocidade
 
     def desenha(self):
         if self.numero == 0:
@@ -119,16 +123,16 @@ class Fantasma:
         if int(self.pix_pos.y+ESPACOS_JOGO//2) % self.programa.altura_quadradoGrid == 0:
             if self.direcao == vec(0,1) or self.direcao == vec(0,-1):
                 return True
-        if self.forma == "clyde" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 0:
+        if self.forma == "clyde" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 0:
             self.direcao = vec(0,-1)
             return True
-        if self.forma == "pinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 500:
+        if self.forma == "pinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 500:
             self.direcao = vec(0,-1)
             return True
-        if self.forma == "inky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 800:
+        if self.forma == "inky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 800:
             self.direcao = vec(0,-1)
             return True
-        if self.forma == "blinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 1200:
+        if self.forma == "blinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 1200:
             self.direcao = vec(0,-1)
             return True
         return False
