@@ -14,6 +14,7 @@ class Pacman:
         self.pode_mover = True
         self.pontuacao = 0
         self.velocidade = 2
+        self.vidas = 3
         #self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
 
     def atualiza(self):
