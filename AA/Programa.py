@@ -63,10 +63,9 @@ class Programa:
     def load(self):
         self.inicio = pygame.image.load('imagens/tela_inicio.png')
         self.aperta_jogar = pygame.image.load('imagens/tela_inicio_aperta.png')
-        self.background = pygame.image.load('imagens/labirinto.png')
+        self.background = pygame.image.load('imagens/labirinto_fechado.png')
         self.perdeu = pygame.image.load('imagens/tela_perdeu.png')
         self.aperta_jogar_dnv = pygame.image.load('imagens/tela_perdeu_aperta.png')
-        self.vidaImg = pygame.image.load("imagens/pacman_vida.png")
         #self.background = pygame.transform.scale(self.background, (LARGURA_LAB, ALTURA_LAB)) #transforma o background de forma a caber na janel
 
         #faz leitura das coisas existentes
@@ -213,8 +212,7 @@ class Programa:
         self.jogador.desenha()
         for fantasma in self.fantasmas:
             fantasma.desenha()
-        for i in range(self.jogador.vidas):
-            self.janela.blit(self.vidaImg, (20+20*i, ALTURA-25))
+
         pygame.display.update()
 
     def perde_vida(self):
@@ -229,8 +227,8 @@ class Programa:
                 fantasma.grid_pos = vec(fantasma.starting_pos)
                 fantasma.pix_pos = fantasma.get_pix_pos()
                 fantasma.direcao *= 0
-                fantasma.pix_pos.x += 11
-                fantasma.pix_pos.y += 10
+                #fantasma.pix_pos.x += 11
+                #fantasma.pix_pos.y += 10
 
     def desenha_moedas(self):
         for moeda in self.moedas:

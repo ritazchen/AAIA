@@ -9,8 +9,8 @@ class Fantasma:
         self.starting_pos = [posicao.x, posicao.y]
         self.pix_pos = self.get_pix_pos() #posicao do inimigo em relação aos pixels
         #as adições são só feitas para que os inimigos fiquem no centro do espaço
-        self.pix_pos.x += 11
-        self.pix_pos.y += 10
+        #self.pix_pos.x += 11
+        #self.pix_pos.y += 10
         self.raio = self.programa.largura_quadradoGrid//2 - 2 #tamanho do raio do inimigo
         self.numero = num #cada inimigo será representado por um numero
         self.cor = None #cada inimigo será representado por uma cor
@@ -18,23 +18,32 @@ class Fantasma:
         self.normal = True
         self.forma = self.set_forma() #se ele vai estar normal (rapido) ou se vai estar assustado (lento)
         self.target = None #objetivo de alcançar o pacman ou fugir do pacman
-        self.fantAzulImg = pygame.image.load("imagens/fant_azul.png")
+        #self.fantAzulImg = pygame.image.load("imagens/fant_azul.png")
         self.velocidade = self.altera_velocidade()
+        self.pode_mover = True
 
     def atualiza(self):
         self.target = self.set_target()
         if self.target != self.grid_pos:
+            #if self.pode_mover:
             self.pix_pos += self.direcao*self.velocidade
             if self.tempo_para_mover():
                 self.move()
+                #self.pode_mover = self.verifica_movimento()
 
         # a parte de baixo indica qual a posicao do grid está o inimigo
         self.grid_pos[0] = (self.pix_pos[0] - ESPACOS_JOGO + self.programa.largura_quadradoGrid // 2) // self.programa.largura_quadradoGrid + 1  # 2
         self.grid_pos[1] = (self.pix_pos[1] - ESPACOS_JOGO + self.programa.altura_quadradoGrid // 2) // self.programa.altura_quadradoGrid + 1  # 2
 
+    def verifica_movimento(self):
+        for parede in self.programa.paredes:
+            if vec(self.grid_pos + self.direcao) == parede:
+                return False
+        return True
+
     def altera_velocidade(self):
-        if self.forma in ["blinky", "inky"]:
-            velocidade = 2
+        if self.forma in ["clyde", "blinky", "inky"]:
+            velocidade = 1 #2
         else:
             velocidade = 1
 
@@ -53,10 +62,11 @@ class Fantasma:
         elif self.numero == 3:
             #self.programa.janela.blit(self.fantAzulImg, (int(self.pix_pos.x), int(self.pix_pos.y)))
             pygame.draw.circle(self.programa.janela, ROSA, (int(self.pix_pos.x), int(self.pix_pos.y)), int(self.raio))
-
-    def get_pix_pos(self):
-        return vec((self.grid_pos.x*self.programa.largura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.largura_quadradoGrid//2,
-                (self.grid_pos.y*self.programa.altura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.altura_quadradoGrid//2)
+        #while self.caminho:
+            #pygame.draw.rect(self.programa.background, LARANJA, (
+                #self.caminho[0][0] * self.programa.largura_quadradoGrid, self.caminho[0][1] * self.programa.altura_quadradoGrid,
+                #self.programa.largura_quadradoGrid, self.programa.altura_quadradoGrid))
+            #self.caminho.pop(self.caminho[0])
 
     def set_forma(self):
         if self.numero == 0:
@@ -71,7 +81,7 @@ class Fantasma:
     def move(self):
         # pode ser um aleatório mais fácil até uma certa pontuação e depois o A* entra em ação
         if self.forma == "blinky":
-            caminho = self.prox_posicao(self.target)
+            caminho = self.pega_caminho(self.target)
             while(caminho):
                 x = caminho[0][0] - self.grid_pos[0]
                 y = caminho[0][1] - self.grid_pos[1]
@@ -82,7 +92,7 @@ class Fantasma:
                     caminho.pop()
                     self.direcao = vec(x, y)
         elif self.forma == "pinky":
-            caminho = self.prox_posicao(self.target)
+            caminho = self.pega_caminho(self.target)
             while(caminho):
                 x = caminho[0][0] - self.grid_pos[0]
                 y = caminho[0][1] - self.grid_pos[1]
@@ -93,7 +103,7 @@ class Fantasma:
                     caminho.pop()
                     self.direcao = vec(x, y)
         elif self.forma == "inky":
-            caminho = self.prox_posicao(self.target)
+            caminho = self.pega_caminho(self.target)
             while(caminho):
                 x = caminho[0][0] - self.grid_pos[0]
                 y = caminho[0][1] - self.grid_pos[1]
@@ -104,7 +114,7 @@ class Fantasma:
                     caminho.pop()
                     self.direcao = vec(x, y)
         elif self.forma == "clyde":
-            caminho = self.prox_posicao(self.target)
+            caminho = self.pega_caminho(self.target)
             while(caminho):
                 x = caminho[0][0] - self.grid_pos[0]
                 y = caminho[0][1] - self.grid_pos[1]
@@ -126,18 +136,18 @@ class Fantasma:
         if self.forma == "clyde" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 0:
             self.direcao = vec(0,-1)
             return True
-        if self.forma == "pinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 500:
+        elif self.forma == "pinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 500:
             self.direcao = vec(0,-1)
             return True
-        if self.forma == "inky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 800:
+        elif self.forma == "inky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 800:
             self.direcao = vec(0,-1)
             return True
-        if self.forma == "blinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 1200:
+        elif self.forma == "blinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao >= 1200:
             self.direcao = vec(0,-1)
             return True
         return False
 
-    def prox_posicao(self, target):
+    def pega_caminho(self, target):
         path = self.Aestrela([int(self.grid_pos.x), int(self.grid_pos.y)],
                 [int(target[0]), int(target[1])])
         return path
@@ -224,17 +234,8 @@ class Fantasma:
             return caminho
 
     def set_target(self): #arrumar essa parte de alvo
-        if self.forma == "blinky" or self.forma == "inky":
+        if self.forma == "blinky" or self.forma == "inky" or self.forma == "pinky":
             return self.programa.jogador.grid_pos
-        elif self.forma == "pinky":
-            if self.programa.jogador.grid_pos[0] > COLS // 2 and self.programa.jogador.grid_pos[1] > ROWS // 2:
-                return vec(1, 1)
-            if self.programa.jogador.grid_pos[0] > COLS // 2 and self.programa.jogador.grid_pos[1] < ROWS // 2:
-                return vec(1, ROWS - 4)
-            if self.programa.jogador.grid_pos[0] < COLS // 2 and self.programa.jogador.grid_pos[1] > ROWS // 2:
-                return vec(COLS - 4, 1)
-            else:
-                return vec(COLS - 2, ROWS - 2)
         else:
             if self.programa.jogador.grid_pos[0] > COLS // 2 and self.programa.jogador.grid_pos[1] > ROWS // 2:
                 return vec(1, 1)
@@ -245,22 +246,6 @@ class Fantasma:
             else:
                 return vec(COLS - 2, ROWS - 2)
 
-
-
-        """elif self.forma == "pinky":
-            if int(self.programa.jogador.grid_pos[0] + 4) > 0 and int(self.programa.jogador.grid_pos[0] + 4) < 28:
-                return [int(self.programa.jogador.grid_pos[0] + 4), int(self.programa.jogador.grid_pos[1])]
-            elif int(self.programa.jogador.grid_pos[0] - 4) > 0 and int(self.programa.jogador.grid_pos[0] - 4) < 28:
-                return [int(self.programa.jogador.grid_pos[0] - 4), int(self.programa.jogador.grid_pos[1])]
-            elif int(self.programa.jogador.grid_pos[1] + 4) > 0 and int(self.programa.jogador.grid_pos[1] + 4) < 30:
-                return [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] + 4)]
-            elif int(self.programa.jogador.grid_pos[1] - 4) > 0 and int(self.programa.jogador.grid_pos[1] - 4) < 30:
-                return [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] - 4)]
-            else:
-                return self.programa.jogador.grid_pos
-        elif self.forma == "inky":
-            if self.programa.jogador.grid_pos[0] > COLS//2 and self.programa.jogador.grid_pos[1] < ROWS//2:
-                return vec(1, ROWS-2)
-        elif self.forma == "clyde":
-            if self.programa.jogador.grid_pos[0] < COLS//2 and self.programa.jogador.grid_pos[1] > ROWS//2:
-                return vec(COLS-2, 1)"""
+    def get_pix_pos(self):
+        return vec((self.grid_pos.x*self.programa.largura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.largura_quadradoGrid//2,
+                (self.grid_pos.y*self.programa.altura_quadradoGrid) + ESPACOS_JOGO//2+self.programa.altura_quadradoGrid//2)

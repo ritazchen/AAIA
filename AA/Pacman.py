@@ -16,6 +16,7 @@ class Pacman:
         self.pontuacao = 0
         self.velocidade = 2
         self.vidas = 3
+        self.vidaImg = pygame.image.load("imagens/pacman_vida.png")
         #self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
 
     def atualiza(self):
@@ -42,16 +43,18 @@ class Pacman:
         #pygame.draw.rect(self.programa.janela, LARANJA, (self.grid_pos[0]*self.programa.largura_quadradoGrid + ESPACOS_JOGO//2,
                                                          #self.grid_pos[1]*self.programa.altura_quadradoGrid + ESPACOS_JOGO//2,
                                                          #self.programa.largura_quadradoGrid, self.programa.altura_quadradoGrid), 1)
-            #if self.vidas >= 2:
-                #self.programa.janela.blit(self.vidaImg, (35, ALTURA - 25))
-            #if self.vidas >=3:
-                #self.programa.janela.blit(self.vidaImg, (55, ALTURA - 25))
+        for i in range(self.vidas):
+            self.programa.janela.blit(self.vidaImg, (20+20*i, ALTURA-25))
 
     def sobreAMoeda(self):
         #verifica se o pacman passou por cima das moedas
         if self.grid_pos in self.programa.moedas:
-            if self.tempo_para_mover():
-                return True
+            if int(self.pix_pos.x + ESPACOS_JOGO // 2) % self.programa.largura_quadradoGrid == 0:
+                if self.direcao == vec(1, 0) or self.direcao == vec(-1, 0):
+                    return True
+            if int(self.pix_pos.y + ESPACOS_JOGO // 2) % self.programa.altura_quadradoGrid == 0:
+                if self.direcao == vec(0, 1) or self.direcao == vec(0, -1):
+                    return True
         return False
 
     def coleta_moeda(self):
@@ -71,10 +74,9 @@ class Pacman:
         if int(self.pix_pos.x+ESPACOS_JOGO//2) % self.programa.largura_quadradoGrid == 0:
             if self.direcao == vec(1,0) or self.direcao == vec(-1,0) or self.direcao == vec(0,0):
                 return True
-        if int(self.pix_pos.y+ESPACOS_JOGO//2) % self.programa.altura_quadradoGrid == 0 or self.direcao == vec(0,0):
-            if self.direcao == vec(0,1) or self.direcao == vec(0,-1):
+        if int(self.pix_pos.y+ESPACOS_JOGO//2) % self.programa.altura_quadradoGrid == 0:
+            if self.direcao == vec(0,1) or self.direcao == vec(0,-1)  or self.direcao == vec(0,0):
                 return True
-        return False
 
     def verifica_movimento(self):
         #se o bater numa parede, não vai atravessar
