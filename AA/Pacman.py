@@ -91,3 +91,6 @@ class Pacman:
 
     def get_grid_posY(self):
         return self.grid_pos[1]
+
+    def get_pontuacao(self):
+        return self.pontuacao

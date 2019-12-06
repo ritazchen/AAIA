@@ -1,7 +1,6 @@
-import pygame
+#import pygame
 import sys
-import copy
-from AA.configuracoes import *
+#from AA.configuracoes import *
 from AA.Pacman import *
 from AA.Fantasma import *
 
@@ -25,6 +24,7 @@ class Programa:
         self.jogador_posicao = None
         self.fantasma_posicao = []
         self.recorde = 0
+        self.pt = 0
         self.load()
         self.jogador = Pacman(self, vec(self.jogador_posicao))
         self.cria_inimigos()
@@ -80,12 +80,9 @@ class Programa:
                         self.jogador_posicao = [indice_x, indice_y] #passa as coordenadas de cada moeda para a lista moedas
                     elif objeto in ["1", "2", "3", "4"]:
                         self.fantasma_posicao.append(vec(indice_x, indice_y)) #passa as coordenadas de inicio dos inimigos
-                    #elif objeto == 'D': #onde estao as portas para os inimigos saírem
-                        #colocar as coordenadas para q o pacman não entre e que os inimigos saiam o mais rapido possivel de la dentro
         arquivo.close()
         with open("recorde.txt", 'r') as arquivo:
             self.recorde = int(arquivo.read())
-            #print(int(valor))
         arquivo.close()
 
     def cria_inimigos(self):
@@ -116,6 +113,7 @@ class Programa:
         arquivo.close()
         self.jogador.vidas = 3
         self.jogador.pontuacao = 0
+        self.pt = 0
         self.jogador.grid_pos = vec(self.jogador.starting_pos)
         self.jogador.pix_pos = self.jogador.get_pix_pos()
         self.jogador.direcao *= 0
@@ -194,6 +192,7 @@ class Programa:
                         self.jogador.move(vec(1, 0))
 
     def jogo_atualiza(self):
+        self.pt = self.jogador.get_pontuacao()
         self.jogador.atualiza()
         for fantasma in self.fantasmas:
             fantasma.atualiza()
@@ -259,3 +258,6 @@ class Programa:
             self.janela.blit(self.aperta_jogar_dnv, (0, 0))
 
         pygame.display.update()
+
+    def get_pt(self):
+        return self.pt

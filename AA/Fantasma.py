@@ -20,10 +20,11 @@ class Fantasma:
         self.target = None #objetivo de alcançar o pacman ou fugir do pacman
         #self.fantAzulImg = pygame.image.load("imagens/fant_azul.png")
         self.velocidade = self.altera_velocidade()
-        self.pode_mover = True
+        #self.pode_mover = True
 
     def atualiza(self):
         self.target = self.set_target()
+        self.altera_velocidade()
         if self.target != self.grid_pos:
             #if self.pode_mover:
             self.pix_pos += self.direcao*self.velocidade
@@ -42,12 +43,15 @@ class Fantasma:
         return True
 
     def altera_velocidade(self):
-        if self.forma in ["clyde", "blinky", "inky"]:
-            velocidade = 1 #2
+        if self.forma in ["pinky", "blinky", "inky"]:
+            if self.programa.get_pt() <= 1200:
+                self.velocidade = 1
+            else:
+                self.velocidade = 2
         else:
-            velocidade = 1
+            self.velocidade = 1
 
-        return velocidade
+        return self.velocidade
 
     def desenha(self):
         if self.numero == 0:
@@ -224,7 +228,7 @@ class Fantasma:
                                             gridAuxiliar[vizinho[0]][vizinho[1]].set_G(atual, vertice)
                                             gridAuxiliar[vizinho[0]][vizinho[1]].set_H(destino, vertice)
                                             gridAuxiliar[vizinho[0]][vizinho[1]].set_F()
-                                            print("oi")
+                                            #print("oi")
 
         if atual == destino: #retornar a lista para percorrer até o destino
             caminho = []
@@ -234,8 +238,69 @@ class Fantasma:
             return caminho
 
     def set_target(self): #arrumar essa parte de alvo
-        if self.forma == "blinky" or self.forma == "inky" or self.forma == "pinky":
+        if self.forma == "blinky" and  [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1])] not in self.programa.paredes:
             return self.programa.jogador.grid_pos
+
+        elif self.forma == "inky":
+            if self.grid_pos[0] != int(self.programa.jogador.grid_pos[0] + 2) and self.grid_pos[1] != int(self.programa.jogador.grid_pos[1]) and \
+                [int(self.programa.jogador.grid_pos[0] + 2), int(self.programa.jogador.grid_pos[1])] not in self.programa.paredes and \
+                int(self.programa.jogador.grid_pos[0] + 2) >= 0 and int(self.programa.jogador.grid_pos[0] + 2) < COLS and int(self.programa.jogador.grid_pos[1]) >= 0 and int(self.programa.jogador.grid_pos[1]) < ROWS:
+                return [int(self.programa.jogador.grid_pos[0] + 2), int(self.programa.jogador.grid_pos[1])]
+
+            elif self.grid_pos[0] != int(self.programa.jogador.grid_pos[0] - 2) and self.grid_pos[1] != int(self.programa.jogador.grid_pos[1]) and \
+                    [int(self.programa.jogador.grid_pos[0] - 2), int(self.programa.jogador.grid_pos[1])] not in self.programa.paredes and \
+                    int(self.programa.jogador.grid_pos[0] - 2) >= 0 and int(self.programa.jogador.grid_pos[0] - 2) < COLS and int(self.programa.jogador.grid_pos[1]) >= 0 and int(self.programa.jogador.grid_pos[1]) < ROWS:
+                return [int(self.programa.jogador.grid_pos[0] - 2), int(self.programa.jogador.grid_pos[1])]
+
+            elif self.grid_pos[0] != int(self.programa.jogador.grid_pos[0]) and self.grid_pos[1] != int(self.programa.jogador.grid_pos[1] + 2) and \
+                    [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] + 2)] not in self.programa.paredes and \
+                    int(self.programa.jogador.grid_pos[0]) >= 0 and int(self.programa.jogador.grid_pos[0]) < COLS and int(self.programa.jogador.grid_pos[1] + 2) >= 0 and int(self.programa.jogador.grid_pos[1] + 2) < ROWS:
+                return [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] + 2)]
+
+            elif self.grid_pos[0] != int(self.programa.jogador.grid_pos[0]) and self.grid_pos[1] != int(self.programa.jogador.grid_pos[1] - 2) and \
+                    [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] - 2)] not in self.programa.paredes and \
+                    int(self.programa.jogador.grid_pos[0]) >= 0 and int(self.programa.jogador.grid_pos[0]) < COLS and int(self.programa.jogador.grid_pos[1] - 2) >= 0 and int(self.programa.jogador.grid_pos[1] - 2) < ROWS:
+                return [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] - 2)]
+
+            elif int(self.programa.jogador.grid_pos[0]) == self.grid_pos[0] + 2 and int(self.programa.jogador.grid_pos[1]) == self.grid_pos[1] or \
+                int(self.programa.jogador.grid_pos[0]) == self.grid_pos[0] - 2 and int(self.programa.jogador.grid_pos[1]) == self.grid_pos[1] or \
+                int(self.programa.jogador.grid_pos[0]) == self.grid_pos[0] and int(self.programa.jogador.grid_pos[1]) == self.grid_pos[1] + 2 or \
+                int(self.programa.jogador.grid_pos[0]) == self.grid_pos[0] and int(self.programa.jogador.grid_pos[1]) == self.grid_pos[1] - 2:
+                return self.programa.jogador.grid_pos
+
+            else:
+                return self.programa.jogador.grid_pos
+
+        elif self.forma == "pinky":
+            if self.grid_pos[0] != int(self.programa.jogador.grid_pos[0] + 4) and self.grid_pos[1] != int(self.programa.jogador.grid_pos[1]) and \
+                [int(self.programa.jogador.grid_pos[0] + 4), int(self.programa.jogador.grid_pos[1])] not in self.programa.paredes and \
+                int(self.programa.jogador.grid_pos[0] + 4) >= 0 and int(self.programa.jogador.grid_pos[0] + 4) < COLS and int(self.programa.jogador.grid_pos[1]) >= 0 and int(self.programa.jogador.grid_pos[1]) < ROWS:
+                return [int(self.programa.jogador.grid_pos[0] + 4), int(self.programa.jogador.grid_pos[1])]
+
+            elif self.grid_pos[0] != int(self.programa.jogador.grid_pos[0] - 4) and self.grid_pos[1] != int(self.programa.jogador.grid_pos[1]) and \
+                    [int(self.programa.jogador.grid_pos[0] - 4), int(self.programa.jogador.grid_pos[1])] not in self.programa.paredes and \
+                    int(self.programa.jogador.grid_pos[0] - 4) >= 0 and int(self.programa.jogador.grid_pos[0] - 4) < COLS and int(self.programa.jogador.grid_pos[1]) >= 0 and int(self.programa.jogador.grid_pos[1]) < ROWS:
+                return [int(self.programa.jogador.grid_pos[0] - 4), int(self.programa.jogador.grid_pos[1])]
+
+            elif self.grid_pos[0] != int(self.programa.jogador.grid_pos[0]) and self.grid_pos[1] != int(self.programa.jogador.grid_pos[1] + 4) and \
+                    [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] + 4)] not in self.programa.paredes and \
+                    int(self.programa.jogador.grid_pos[0]) >= 0 and int(self.programa.jogador.grid_pos[0]) < COLS and int(self.programa.jogador.grid_pos[1] + 4) >= 0 and int(self.programa.jogador.grid_pos[1] + 4) < ROWS:
+                return [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] + 4)]
+
+            elif self.grid_pos[0] != int(self.programa.jogador.grid_pos[0]) and self.grid_pos[1] != int(self.programa.jogador.grid_pos[1] - 4) and \
+                    [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] - 4)] not in self.programa.paredes and \
+                    int(self.programa.jogador.grid_pos[0]) >= 0 and int(self.programa.jogador.grid_pos[0]) < COLS and int(self.programa.jogador.grid_pos[1] - 4) >= 0 and int(self.programa.jogador.grid_pos[1] - 4) < ROWS:
+                return [int(self.programa.jogador.grid_pos[0]), int(self.programa.jogador.grid_pos[1] - 4)]
+
+            elif int(self.programa.jogador.grid_pos[0]) == self.grid_pos[0] + 4 and int(self.programa.jogador.grid_pos[1]) == self.grid_pos[1] or \
+                int(self.programa.jogador.grid_pos[0]) == self.grid_pos[0] - 4 and int(self.programa.jogador.grid_pos[1]) == self.grid_pos[1] or \
+                int(self.programa.jogador.grid_pos[0]) == self.grid_pos[0] and int(self.programa.jogador.grid_pos[1]) == self.grid_pos[1] + 4 or \
+                int(self.programa.jogador.grid_pos[0]) == self.grid_pos[0] and int(self.programa.jogador.grid_pos[1]) == self.grid_pos[1] - 4:
+                return self.programa.jogador.grid_pos
+
+            else:
+                return self.programa.jogador.grid_pos
+
         else:
             if self.programa.jogador.grid_pos[0] > COLS // 2 and self.programa.jogador.grid_pos[1] > ROWS // 2:
                 return vec(1, 1)
