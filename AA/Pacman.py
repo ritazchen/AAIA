@@ -14,7 +14,7 @@ class Pacman:
         self.pode_mover = True
         self.pontuacao = 0
         self.velocidade = 2
-        self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
+        #self.pacmanImg = pygame.image.load("imagens/pacman_ABERTO.png")
 
     def atualiza(self):
         #só pode andar se não for parede
@@ -68,6 +68,7 @@ class Pacman:
         if int(self.pix_pos.y+ESPACOS_JOGO//2) % self.programa.altura_quadradoGrid == 0:
             if self.direcao == vec(0,1) or self.direcao == vec(0,-1):
                 return True
+        return False
 
     def verifica_movimento(self):
         #se o bater numa parede, não vai atravessar

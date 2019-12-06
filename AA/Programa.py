@@ -74,6 +74,7 @@ class Programa:
                     #elif objeto == 'D': #onde estao as portas para os inimigos saírem
                         #colocar as coordenadas para q o pacman não entre e que os inimigos saiam o mais rapido possivel de la dentro
         arquivo.close()
+        #print("paredes:", self.paredes)
 
     def cria_inimigos(self):
         #cria um inimigo em cada posição
@@ -130,22 +131,24 @@ class Programa:
                 for parede in self.paredes: #se o proximo mov bater numa parede, nao deixar movimentar
                     if [int(self.jogador.get_grid_posX()), int(self.jogador.get_grid_posY() - 1)] != [int(parede[0]), int(parede[1])]:
                         up += 1
-                    if [int(self.jogador.get_grid_posX()), int(self.jogador.get_grid_posY() + 1)] != [int(parede[0]), int(parede[1])]:
-                        down += 1
-                    if [int(self.jogador.get_grid_posX() - 1), int(self.jogador.get_grid_posY())] != [int(parede[0]), int(parede[1])]:
-                        left += 1
-                    if [int(self.jogador.get_grid_posX() + 1), int(self.jogador.get_grid_posY())] != [int(parede[0]), int(parede[1])]:
-                        right += 1
-
                     if up == len(self.paredes) and (evento.key == pygame.K_UP or evento.key == pygame.K_w):
                         self.jogador.move(vec(0,-1))
                         self.jogador.angulo = 90
+
+                    if [int(self.jogador.get_grid_posX()), int(self.jogador.get_grid_posY() + 1)] != [int(parede[0]), int(parede[1])]:
+                        down += 1
                     if down == len(self.paredes) and (evento.key == pygame.K_DOWN or evento.key == pygame.K_s):
                         self.jogador.angulo = 270
                         self.jogador.move(vec(0, 1))
+
+                    if [int(self.jogador.get_grid_posX() - 1), int(self.jogador.get_grid_posY())] != [int(parede[0]), int(parede[1])]:
+                        left += 1
                     if left == len(self.paredes) and (evento.key == pygame.K_LEFT or evento.key == pygame.K_a):
                         self.jogador.angulo = 180
                         self.jogador.move(vec(-1, 0))
+
+                    if [int(self.jogador.get_grid_posX() + 1), int(self.jogador.get_grid_posY())] != [int(parede[0]), int(parede[1])]:
+                        right += 1
                     if right == len(self.paredes) and (evento.key == pygame.K_RIGHT or evento.key == pygame.K_d):
                         self.jogador.angulo = 0
                         self.jogador.move(vec(1, 0))
