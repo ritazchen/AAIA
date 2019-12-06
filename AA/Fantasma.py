@@ -66,7 +66,6 @@ class Fantasma:
 
     def move(self):
         # pode ser um aleatório mais fácil até uma certa pontuação e depois o A* entra em ação
-        self.target = self.set_target()
         if self.forma == "blinky":
             caminho = self.prox_posicao(self.target)
             while(caminho):
@@ -120,7 +119,7 @@ class Fantasma:
         if int(self.pix_pos.y+ESPACOS_JOGO//2) % self.programa.altura_quadradoGrid == 0:
             if self.direcao == vec(0,1) or self.direcao == vec(0,-1):
                 return True
-        if self.forma == "blinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 0:
+        if self.forma == "clyde" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 0:
             self.direcao = vec(0,-1)
             return True
         if self.forma == "pinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 500:
@@ -129,7 +128,7 @@ class Fantasma:
         if self.forma == "inky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 800:
             self.direcao = vec(0,-1)
             return True
-        if self.forma == "clyde" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 1200:
+        if self.forma == "blinky" and self.direcao == vec(0,0) and self.programa.jogador.pontuacao == 1200:
             self.direcao = vec(0,-1)
             return True
         return False
@@ -158,7 +157,7 @@ class Fantasma:
         #faz um grid auxiliar de vertices
         gridAuxiliar = [[Vertice(self.programa, False) for x in range(30)] for x in range(28)]
         for parede in self.programa.paredes:
-            if parede.x < 28 and parede.y < 30:
+            if parede.x < COLS and parede.y < ROWS:
                 gridAuxiliar[int(parede.x)][int(parede.y)].ehParede = True #ele tem as coordenadas trocadas msm
                 gridAuxiliar[int(parede.x)][int(parede.y)].inicializa_G() #trocar o g
                 gridAuxiliar[int(parede.x)][int(parede.y)].inicializa_H() #trocar o h
@@ -202,15 +201,16 @@ class Fantasma:
                                 gridAuxiliar[vizinho[0]][vizinho[1]].set_H(destino, vizinho)
                                 gridAuxiliar[vizinho[0]][vizinho[1]].set_F()
                             else: #Se pertence a lista aberta
-                                for vertice in lista_aberta:
+                                for vertice in lista_aberta: #ver essa parte aqui !!
                                     if vizinho == vertice:
                                         if gridAuxiliar[vizinho[0]][vizinho[1]].get_G() < gridAuxiliar[vertice[0]][vertice[1]].get_G():
                                             gridAuxiliar[vizinho[0]][vizinho[1]].set_Pai(atual)
                                             gridAuxiliar[vizinho[0]][vizinho[1]].set_GdoPai(gridAuxiliar[atual[0]][atual[1]].get_G())
                                             # Atualize os custos:
-                                            gridAuxiliar[vertice[0]][vertice[1]].set_G(atual, vertice)
-                                            gridAuxiliar[vertice[0]][vertice[1]].set_H(destino, vertice)
-                                            gridAuxiliar[vertice[0]][vertice[1]].set_F()
+                                            gridAuxiliar[vizinho[0]][vizinho[1]].set_G(atual, vertice)
+                                            gridAuxiliar[vizinho[0]][vizinho[1]].set_H(destino, vertice)
+                                            gridAuxiliar[vizinho[0]][vizinho[1]].set_F()
+                                            print("oi")
 
         if atual == destino: #retornar a lista para percorrer até o destino
             caminho = []
@@ -219,8 +219,27 @@ class Fantasma:
                 atual = gridAuxiliar[atual[0]][atual[1]].get_Pai()
             return caminho
 
-    def set_target(self):
-        return self.programa.jogador.grid_pos
+    def set_target(self): #arrumar essa parte de alvo
+        if self.forma == "blinky" or self.forma == "inky":
+            return self.programa.jogador.grid_pos
+        elif self.forma == "pinky":
+            if self.programa.jogador.grid_pos[0] > COLS // 2 and self.programa.jogador.grid_pos[1] > ROWS // 2:
+                return vec(1, 1)
+            if self.programa.jogador.grid_pos[0] > COLS // 2 and self.programa.jogador.grid_pos[1] < ROWS // 2:
+                return vec(1, ROWS - 4)
+            if self.programa.jogador.grid_pos[0] < COLS // 2 and self.programa.jogador.grid_pos[1] > ROWS // 2:
+                return vec(COLS - 4, 1)
+            else:
+                return vec(COLS - 2, ROWS - 2)
+        else:
+            if self.programa.jogador.grid_pos[0] > COLS // 2 and self.programa.jogador.grid_pos[1] > ROWS // 2:
+                return vec(1, 1)
+            if self.programa.jogador.grid_pos[0] > COLS // 2 and self.programa.jogador.grid_pos[1] < ROWS // 2:
+                return vec(1, ROWS - 2)
+            if self.programa.jogador.grid_pos[0] < COLS // 2 and self.programa.jogador.grid_pos[1] > ROWS // 2:
+                return vec(COLS - 2, 1)
+            else:
+                return vec(COLS - 2, ROWS - 2)
 
 
 
